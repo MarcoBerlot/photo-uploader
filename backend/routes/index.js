@@ -4,20 +4,16 @@ var AWS = require ( 'aws-sdk');
 var multer = require ('multer');
 
 // Configuration Credentials
-var CONFIG = require('./config.json');
-var accessKey = CONFIG.AWS_ACCESS_KEY_ID;
-var secretAccessKey = CONFIG.AWS_SECRET_ACCESS_KEY;
-var bucket = CONFIG.S3_BUCKET;
-var region = CONFIG.REGION;
+const CONFIG = require("../config.json");
 
 const timestamp = JSON.stringify(new Date())
 const s3 = new AWS.S3();
 
 AWS.config.update(
     {
-        accessKeyId: accessKey,
-        secretAccessKey: secretAccessKey,
-        subregion: region,
+        accessKeyId: CONFIG.AWS_ACCESS_KEY_ID,
+        secretAccessKey: CONFIG.AWS_SECRET_ACCESS_KEY,
+        subregion: CONFIG.REGION,
     });
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -28,7 +24,7 @@ router.post('/upload', upload.single('theseNamesMustMatch'), (req, res) => {
     // req.file is the 'theseNamesMustMatch' file
     // saves timestamp as filename
     s3.putObject({
-        Bucket: bucket,
+        Bucket: CONFIG.S3_BUCKET,
         Key: timestamp,
         Body: req.file.buffer,
         ACL: 'public-read', // your permisions
